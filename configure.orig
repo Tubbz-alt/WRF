@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# Modified for WRF-ROMS ESMF-NUOPC Coupling (Arango/Robertson, Jan 2019)
-
 # parse argument list
 
 thiscmd=$0
@@ -206,12 +204,6 @@ fi
 
 # If the user asked for classic netcdf, acquiesce to the request.
 
-# This is a bad idea for at least two reasons:
-# 1. There is a very good chance that nf-config would be in a user's PATH but no be the
-#    nf-config located at $NETCDF/bin causing configuration mismatches
-# 2. If nf-config is not in the user's PATH but they have set $NETCDF and $NETCDF4
-#    correctly, you're taking away the ability to use NetCDF-4 features
-
 if [ "`uname`" = "Linux" ] ; then
   ans="`whereis nf-config`"
 elif [ "`uname`" = "Darwin" ] ; then
@@ -221,8 +213,7 @@ else
 # echo "Add in your architecture's uname and the command to find executables in the path"
 # exit 1
 fi
-
-if [ ! -f "$NETCDF/bin/nf-config" ] ; then
+if [ "$ans" = "nf-config:" -o "$ans" = "" ] ; then
     export NETCDF_classic=1
     unset NETCDF4
 else
@@ -234,7 +225,7 @@ else
       export NETCDF4=1
     fi
   else
-    if [ "`$NETCDF/bin/nf-config --has-nc4`" = "yes" ] ; then
+    if [ "`nf-config --has-nc4`" = "yes" ] ; then
       unset  NETCDF_classic
       export NETCDF4=1
     else
@@ -257,12 +248,6 @@ if [ -n "$NETCDF4" ] ; then
       DEP_LIB_PATH="`$nx_config | awk '{for(i=1;i<=NF;i++){if(match($i, /-L.*/)) {print $i} } }'`"
       CURL="`$nx_config | awk '{for(i=1;i<=NF;i++){if($i == "-lcurl") {print $i} } }'`"
       GPFS="`$nx_config | awk '{for(i=1;i<=NF;i++){if($i == "-lgpfs") {print $i} } }'`"
-      if [ "$CURL" != '' -a  "$CURL_PATH" = '' ] ; then
-         CURL_PATH="DEFAULT"
-      fi
-      if [ "$GPFS" != '' -a  "$GPFS_PATH" = '' ] ; then
-         GPFS_PATH="DEFAULT"
-      fi
     fi
     if [ "$DEP_LIB_PATH" = '' ] ; then
       if [ -f $NETCDF/bin/nc-config ] ; then
@@ -558,8 +543,6 @@ elif command -v time > /dev/null 2>&1; then
   FORTRAN_COMPILER_TIMER=time
   echo "Will use 'time' to report timing information"
 fi
-
-FORTRAN_COMPILER_TIMER=""
 
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
@@ -896,7 +879,7 @@ EOF
   rm -f ${foo} ${foo}.[cfo] 2> /dev/null
 fi
 
-# testing for Fortran 2003 IEEE signaling features
+# testing for Fortran 2003 IEEE features
 make fortran_2003_ieee_test > tools/fortran_2003_ieee_test.log 2>&1
 rm -f tools/fortran_2003_ieee_test.log
 retval=-1
@@ -910,8 +893,8 @@ if [ $retval -ne 0 ] ; then
   echo " "
   echo "************************** W A R N I N G ************************************"
   echo " "
-  echo "There are some Fortran 2003 features in WRF that your compiler does not recognize"
-  echo "The IEEE signaling call has been removed.  That may not be enough."
+  echo "There are some IEEE Fortran 2003 features in WRF that your compiler does not"
+  echo "recognize. The IEEE function calls have been removed."
   echo " "
   echo "*****************************************************************************"
 fi

@@ -522,13 +522,13 @@ CONTAINS
         FLHC(i)=CPM(I)*RHOX(I)*CHS(I)
         FLQC(i)=RHOX(I)*CQS*MAVAIL(I)
         QFX(I)=FLQC(I)*(QSFC(I)-QV1D(I))                                     
-        QFX(I)=AMAX1(QFX(I),0.)                                            
+!        QFX(I)=AMAX1(QFX(I),0.)                                            
         LH(I)=XLV*QFX(I)
         IF(XLAND(I)-1.5.GT.0.)THEN                                           
           HFX(I)=-FLHC(I)*DTG                               
         ELSEIF(XLAND(I)-1.5.LT.0.)THEN                                       
           HFX(I)=-FLHC(I)*DTG                               
-          HFX(I)=AMAX1(HFX(I),-250.)                                       
+!          HFX(I)=AMAX1(HFX(I),-250.)                                       
         ENDIF      
       ENDDO                                           
 

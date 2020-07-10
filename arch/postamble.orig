@@ -1,5 +1,3 @@
-# Modified for WRF-ROMS ESMF-NUOPC Coupling (Arango/Robertson, Jan 2019)
-
 ######################
 # POSTAMBLE
 
@@ -19,6 +17,7 @@ ARCHFLAGS       =    $(COREDEFS) -DIWORDSIZE=$(IWORDSIZE) -DDWORDSIZE=$(DWORDSIZ
                       CONFIGURE_HDF5_FLAG \
                       CONFIGURE_CLOUDCV_FLAG \
                       CONFIGURE_4DVAR_FLAG \
+                      CONFIGURE_TERRAIN_AND_LANDUSE \
                       CONFIGURE_WAVELET_FLAG \
                       CONFIGURE_NESTOPT \
                       -DUSE_ALLOCATABLES \
@@ -28,11 +27,13 @@ ARCHFLAGS       =    $(COREDEFS) -DIWORDSIZE=$(IWORDSIZE) -DDWORDSIZE=$(DWORDSIZ
                       -DKEEP_INT_AROUND \
                       -DLIMIT_ARGS \
                       -DBUILD_RRTMG_FAST=1 \
+                      -DSHOW_ALL_VARS_USED=0 \
                       -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                       -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
                       -DMAX_HISTORY=$(MAX_HISTORY) \
 		      -DNMM_NEST=$(WRF_NMM_NEST)
 CFLAGS          =    $(CFLAGS_LOCAL) CONFIGURE_DMPARALLEL CONFIGURE_STUBMPI \
+                     CONFIGURE_TERRAIN_AND_LANDUSE \
                       -DMAX_HISTORY=$(MAX_HISTORY) CONFIGURE_NMM_CORE
 FCFLAGS         =    $(FCOPTIM) $(FCBASEOPTS)
 ESMF_LIB_FLAGS  =    ESMFLIBFLAG
@@ -104,7 +105,7 @@ module_dm_rsllite :
 wrfio_nf : 
 	( cd $(WRF_SRC_ROOT_DIR)/external/io_netcdf ; \
           make $(J) NETCDFPATH="$(NETCDFPATH)" RANLIB="$(RANLIB)" CPP="$(CPP)" \
-          CC="$(SCC)" CFLAGS="$(CFLAGS)" NETCDF4_DEP_LIB="$(NETCDF4_DEP_LIB)" \
+          CC="$(SCC)" CFLAGS="$(CFLAGS)" \
           FC="$(SFC) $(PROMOTION) $(OMP) $(FCFLAGS)" TRADFLAG="$(TRADFLAG)" AR="$(AR)" ARFLAGS="$(ARFLAGS)" )
 
 wrfio_pnf : 
